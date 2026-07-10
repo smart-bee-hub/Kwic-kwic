@@ -40,8 +40,23 @@ Feel free to expand this and make any pull requests to help improve.
 
 ## dependencies
 
-Kwic only work on **Linux systems** with **Wayland**. I will expand compatability in the future.
-<br><br><br>
+Kwic only work on **Linux systems** with **Wayland**.
+<br>
+wl-clipboard is required, which can be installed via the terminal:
 
+### Debian based:
+
+<code>sudo apt install wl-clipboard</code>
+<br>
+
+### Fedora / RHEL based:
+
+<code>sudo dnf install wl-clipboard</code>
+<br>
+
+### Arch based:
+
+<code>sudo pacman -S wl-clipboard</code>
+<br><br><br><br>
 
 <footer>Thanks for using Kwic :D</footer>
