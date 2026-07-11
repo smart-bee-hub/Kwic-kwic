@@ -2,7 +2,6 @@
 
 Kwic is a tool that means you never have to find your API keys again. Just save it once under a name, and retrieve it whenever you need. Of course, this doesn't have to be for API keys, use it to store whatever text you need.<br>
 
-> *I don't really know to do the fancy MD stuff you always see, so forgive the poor appearance.*
 
 > **Important:** if you don't want to read the whole thing, please just take a look at [this](#disclaimer) and especially **[this.](#dependencies)** For **copyright info** view the [license.](LICENSE)
 
@@ -12,25 +11,27 @@ Kwic is a tool that means you never have to find your API keys again. Just save 
 
 Kwic was made quite simple. It only has four commands total:
 
-- Register a key <code>kwic -n my-api-key thisismyapikey</code>
+- Register a key `kwic -n my-api-key thisismyapikey`
 
-- Copy a key to clipboard <code>kwic -c my-api-key</code>
+- Copy a key to clipboard `kwic -c my-api-key`
 
-- List all saved keys <code>kwic ls</code>
+- List all saved keys `kwic ls`
 
     This will return something that looks like this:
 
-    <code>my-api-key:thisismyapikey<br>
-    github-token:ghp_whatevermytokenis<br>
-    stackpassword:mystackoverflowpassword</code>
+    ```
+    my-api-key:thisismyapikey
+    github-token:ghp_whatevermytokenis
+    stackpassword:mystackoverflowpassword
+    ```
 
     The colon simply acts as a separator between the name you set, and the value.
 
 - Delete a key
 
-    <code>kwic -r my-api-key</code>
+    `kwic -r my-api-key`
     <br>or<br>
-    <code>kwic rm my-api-key</code>
+    `kwic rm my-api-key`
 
 ## Disclaimer
 
@@ -44,19 +45,11 @@ Kwic only work on **Linux systems** with **Wayland**.
 <br>
 wl-clipboard is required, which can be installed via the terminal:
 
-### Debian based:
+- Debian based: `sudo apt install wl-clipboard`
 
-<code>sudo apt install wl-clipboard</code>
-<br>
+- Fedora / RHEL based: `sudo dnf install wl-clipboard`
 
-### Fedora / RHEL based:
-
-<code>sudo dnf install wl-clipboard</code>
-<br>
-
-### Arch based:
-
-<code>sudo pacman -S wl-clipboard</code>
+- Arch based: `sudo pacman -S wl-clipboard`
 <br><br><br><br>
 
 <footer>Thanks for using Kwic :D</footer>
