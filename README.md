@@ -9,11 +9,13 @@ Kwic is a tool that means you never have to find your API keys again. Just save 
 
 ## How To Use
 
-Kwic was made quite simple. It only has four commands total:
+Kwic was made quite simple. It only has a few commands you need:
 
 - Register a key `kwic -n my-api-key thisismyapikey`
 
 - Copy a key to clipboard `kwic -c my-api-key`
+
+- Rename a key `kwic -r my-api-key new-name`
 
 - List all saved keys `kwic ls`
 
@@ -27,11 +29,7 @@ Kwic was made quite simple. It only has four commands total:
 
     The colon simply acts as a separator between the name you set, and the value.
 
-- Delete a key
-
-    `kwic -r my-api-key`
-    <br>or<br>
-    `kwic rm my-api-key`
+- Delete a key `kwic rm my-api-key`
 
 ## Disclaimer
 

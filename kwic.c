@@ -1,26 +1,8 @@
 /*
-MIT License
-
-Copyright (c) 2026 Sam (sjbeaumont)
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+ * Copyright (c) 2026 Sam (sjbeaumont)
+ * SPDX-License-Identifier: MIT
+ * Distributed under the terms of the MIT License.
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,9 +11,11 @@ SOFTWARE.
 #include <sys/stat.h>
 #include <unistd.h>
 
-char path[256];
-char temppath[256];
-char value[8192];
+char kwicdP[256]; // used to store kwicd.txt path
+char tempKwicdP[256]; // used to store kwicd-temp.txt path
+char renameValue[4096]; // used to store value when renaming
+
+
 
 static int mkdir_if_missing(const char *dir) {
     if (mkdir(dir, 0755) == 0) return 0;
@@ -46,7 +30,7 @@ static void usage(void) {
 
 void new(const char *alias, const char *value) {
     FILE *kwicd;
-    kwicd = fopen(path, "a");
+    kwicd = fopen(kwicdP, "a");
     if (!kwicd) { printf("Kwicd file not found."); exit(1); };
 
     fprintf(kwicd, "%s:%s\n", alias, value);
@@ -58,7 +42,7 @@ void copy(const char *alias) {
     FILE *kwicd;
     char line[4096];
 
-    kwicd = fopen(path, "r");
+    kwicd = fopen(kwicdP, "r");
     if (!kwicd) { printf("Kwicd file not found."); exit(1); }
 
     while (fgets(line, sizeof(line), kwicd)) {
@@ -89,7 +73,7 @@ int scan(const char *alias) {  // -2 = file not found, -1 = alias not found
     char line[4096];
     int ln = 1;
 
-    kwicd = fopen(path, "r");
+    kwicd = fopen(kwicdP, "r");
     if (!kwicd) return -2;
 
     while (fgets(line, sizeof(line), kwicd)) {
@@ -101,6 +85,8 @@ int scan(const char *alias) {  // -2 = file not found, -1 = alias not found
         *colon = '\0';
         char *key = line;
         char *val = colon + 1;
+
+        snprintf(renameValue, sizeof(renameValue), val); // save in case of renaming
 
         if (strcmp(key, alias) != 0) { ln++; continue; }
 
@@ -123,8 +109,8 @@ void delete(const char *alias) {
     if (del_ln == -2) { printf("Kwicd file not found.\n"); exit(1); }
     else if (del_ln == -1) { printf("Alias not found.\n"); exit(1); }
     
-    kwicd = fopen(path, "r");
-    temp = fopen(temppath, "w");
+    kwicd = fopen(kwicdP, "r");
+    temp = fopen(tempKwicdP, "w");
 
     if (!kwicd) { printf("Kwicd file not found."); exit(1); }
     if (!temp) {printf("Temporary Kwicd file could not be created."); exit(1); }
@@ -139,9 +125,12 @@ void delete(const char *alias) {
     fclose(kwicd);
     fclose(temp);
 
-    remove(path);
-    rename(temppath, path);
+    remove(kwicdP);
+    rename(tempKwicdP, kwicdP);
 }
+
+
+
 
 int main(int argc, char *argv[]) {
     const char *home = getenv("HOME");
@@ -151,36 +140,44 @@ int main(int argc, char *argv[]) {
     snprintf(dir, sizeof(dir), "%s/.local/share/kwic", home); // data dir
     if (mkdir_if_missing(dir) != 0) return 1;
 
-    snprintf(path, sizeof(path), "%s/.local/share/kwic/kwicd.txt", home); // data file
-    snprintf(temppath, sizeof(temppath), "%s/.local/share/kwic/kwicd-temp.txt", home);
+    snprintf(kwicdP, sizeof(kwicdP), "%s/.local/share/kwic/kwicd.txt", home); // data file
+    snprintf(tempKwicdP, sizeof(tempKwicdP), "%s/.local/share/kwic/kwicd-temp.txt", home);
 
     for (int i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "-n") == 0) {
+        if (strcmp(argv[i], "-n") == 0) { // make new
             if (i + 2 >= argc) { usage(); return 1; }
             new(argv[i + 1], argv[i + 2]);
             i += 2;
         } 
         
-        else if (strcmp(argv[i], "-c") == 0) {
+        else if (strcmp(argv[i], "-c") == 0) { // copy to clipboard
             if (i + 1 >= argc) { usage(); return 1; }
             copy(argv[i + 1]);
             i += 1;
         }
 
+        else if (strcmp(argv[i], "-r") == 0) { // rename
+            if (i + 2 >= argc) { usage(); return 1; }
+
+            delete(argv[i + 1]);
+            new(argv[i + 2], renameValue);
+            i += 2;
+        }
+
         else if (strcmp(argv[i], "ls") == 0) {
-            char cmd[64];
-            snprintf(cmd, sizeof(cmd), "cat '%s'", path);
+            char cmd[256 + 16];
+            snprintf(cmd, sizeof(cmd), "cat '%s'", kwicdP);
             system(cmd);
             printf("\n");
         }
 
-        else if (strcmp(argv[i], "rm" ) == 0 || strcmp(argv[i], "-r") == 0) {
+        else if (strcmp(argv[i], "rm" ) == 0) { // remove
             if (i + 1 >= argc) { usage(); return 1; }
             delete(argv[i + 1]);
             i += 1;
         }
 
-        else if (strcmp(argv[i], "clear") == 0) {
+        else if (strcmp(argv[i], "clear") == 0) { // clear clipboard
             system("printf '' | wl-copy");
         } 
 
