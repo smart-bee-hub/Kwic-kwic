@@ -1,0 +1,7 @@
+*.sh
+
+kwic
+
+releases/*
+bin-files/*
+bin/*
