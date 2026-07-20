@@ -37,7 +37,7 @@ I've only been coding C for a month now, and this is the first project I've buil
 
 Feel free to expand this and make any pull requests to help improve.
 
-## dependencies
+## Dependencies
 
 Kwic only work on **Linux systems** with **Wayland**.
 <br>
